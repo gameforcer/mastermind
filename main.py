@@ -21,13 +21,13 @@ class App(QMainWindow):
         self.setGeometry(self.left, self.top, self.width, self.height)
 
         self.game_data = QLabel(self)
-        self.game_data.setText("dobre pozycje:            dobre cyfry:              tura:")
+        self.game_data.setText("good positions:            good numbers:          turn:")
         self.game_data.move(250, 0)
         self.game_data.resize(280,40)
 
         self.history = QLabel(self)
-        self.history.setText("historia:")
-        self.history.move(160, 5)
+        self.history.setText("history:")
+        self.history.move(161, 5)
 
         self.history_data = QLabel(self)
         self.history_data.setText("")
@@ -45,7 +45,7 @@ class App(QMainWindow):
         self.crct_num.setText("")
         self.crct_num.resize(50,155)
         self.crct_num.setAlignment(Qt.AlignTop)
-        self.crct_num.move(357, 28)
+        self.crct_num.move(359, 28)
 
         self.crnt_turn = QLabel(self)
         self.crnt_turn.setText("")
@@ -57,7 +57,7 @@ class App(QMainWindow):
         self.textbox.move(20, 20)
         self.textbox.resize(100,20)
         
-        self.chck_B = QPushButton('Sprawdź', self)
+        self.chck_B = QPushButton('Check', self)
         self.chck_B.move(20,60)
         self.chck_B.resize(80,30)
 
@@ -65,21 +65,17 @@ class App(QMainWindow):
         self.reset_B.move(20,100)
         self.reset_B.resize(80,30)
 
-        self.cheater_B = QPushButton("Oszust!", self)
+        self.cheater_B = QPushButton("Cheater!", self)
         self.cheater_B.move(20,140)
         self.cheater_B.resize(80,30)
 
         self.popup = QLabel()
         self.popup.resize(80,80)
         self.popup.setAlignment(Qt.AlignCenter)
-        
-        checkFun = lambda x: x.chck_click 
-        resetFun = lambda x: x.reset_click 
-        cheaterFun = lambda x: x.cheat_click 
 
-        self.chck_B.clicked.connect(checkFun(self))
-        self.reset_B.clicked.connect(resetFun(self))
-        self.cheater_B.clicked.connect(cheaterFun(self))
+        self.chck_B.clicked.connect(self.chck_click)
+        self.reset_B.clicked.connect(self.reset_click)
+        self.cheater_B.clicked.connect(self.cheat_click)
         self.show()
     
     def initPyGame(self):
@@ -89,32 +85,30 @@ class App(QMainWindow):
     def chck_click(self):
         self.s = self.textbox.text()
         self.guess_vals = [int(c) for c in self.s if c in '123456']
-        print(self.guess_vals)
         if not hasattr(self.game, "_result_flag") and len(self.guess_vals) == 4 and len(self.s) == 4:
-            self.game.setGuess(self.guess_vals)
-            self.game.runTurn()
+            self.game.set_guess(self.guess_vals)
+            self.game.run_turn()
 
-            #printed data updates
-            self.crct_pos.setText(self.crct_pos.text()+str(self.game.getCrctPos())+'\n')
-            self.crct_num.setText(self.crct_num.text()+str(self.game.getCrctNum())+'\n')
-            self.crnt_turn.setText(self.crnt_turn.text()+str(self.game.getTries())+'\n')
-            self.history_data.setText(self.history_data.text()+self.s+'\n')
+            self.crct_pos.setText(f"{self.crct_pos.text()}{self.game.get_correct_pos()}\n") 
+            self.crct_num.setText(f"{self.crct_num.text()}{self.game.get_correct_num()}\n")
+            self.crnt_turn.setText(f"{self.crnt_turn.text()}{self.game.get_tries()}\n")
+            self.history_data.setText(f"{self.history_data.text()}{self.s}\n")
             self.textbox.setText("")
             
             if hasattr(self.game, "_result_flag"):
                 if self.game._result_flag:
-                    self.popup.setText("Wygrana")
+                    self.popup.setText("You win")
                 else:
-                    self.popup.setText("Przegrana")
+                    self.popup.setText("You lose")
                 self.popup.show()
 
     @pyqtSlot()
     def reset_click(self):
-        if randint(0, 2):
-            self.game = normalMode()
+        if randint(0, 1):
+            self.game = NormalMode()
             print("NORMAL MODE ON")
         else:
-            self.game = cheatMode()
+            self.game = CheatMode()
             print("CHEAT MODE ON")
         
         self.history_data.setText("")
@@ -125,11 +119,11 @@ class App(QMainWindow):
     
     @pyqtSlot()
     def cheat_click(self):
-        if isinstance(self.game, cheatMode) and not hasattr(self.game, "_result_flag"):
-            self.popup.setText("Złapałeś/łaś mnie!")
+        if isinstance(self.game, CheatMode) and not hasattr(self.game, "_result_flag"):
+            self.popup.setText("You got me!")
             self.game._result_flag = True
         else:
-            self.popup.setText("Tere fere\n"+str(self.game._key))
+            self.popup.setText(f"Nuh-uh\n{self.game._key}")
             self.game._result_flag = False
         self.popup.show()
 

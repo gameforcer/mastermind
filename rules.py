@@ -1,38 +1,38 @@
 from collections import Counter
 from random import sample, randint
 
-class gameRules:
+class GameRules:
     
     def __init__(self):
         self._tries = 0
         self._total_turns = 12
-        self.genKey()
+        self.gen_key()
 
-    def setGuess(self, vals:list):
+    def set_guess(self, vals:list):
         self._guess = vals
 
-    def genKey(self):
+    def gen_key(self):
         self._key = sample(range(1, 6 + 1), 4)
 
-    def chckCorrect(self):
+    def check_correct(self):
         self._correct_pos = sum( i ==  j for i, j in zip(self._guess, self._key))
         self._correct_num = sum((Counter(self._guess) & Counter(self._key)).values())
-        print(str(self._correct_pos) +" "+ str(self._correct_num) +" (klucz: "+str(self._key)+")")
+        print(f"{self._correct_pos} {self._correct_num} (key: {self._key})")
 
-    def getCrctPos(self):
+    def get_correct_pos(self):
         return self._correct_pos
 
-    def getCrctNum(self):
+    def get_correct_num(self):
         return self._correct_num
 
-    def getTries(self):
+    def get_tries(self):
         return self._tries
 
 
-class normalMode(gameRules):
-    def runTurn(self):
+class NormalMode(GameRules):
+    def run_turn(self):
         self._tries += 1
-        self.chckCorrect()
+        self.check_correct()
         if self._tries < self._total_turns:
             if self._guess == self._key:
                 self._result_flag = True
@@ -40,20 +40,17 @@ class normalMode(gameRules):
             self._result_flag = False
 
 
-class cheatMode(gameRules):
-    def runTurn(self):
+class CheatMode(GameRules):
+    def run_turn(self):
         self._tries += 1
-        self.chckCorrect()
+        self.check_correct()
         if self._tries < self._total_turns:
 
-            if randint(0, 2):
-                self.chckCorrect()
-            else:
-                self._correct_pos = randint(1, 4)
-                self._correct_num = randint(1, 4)
+            if randint(0, 1):
+                self._correct_pos = randint(1, 3)
+                self._correct_num = randint(1, 3)
 
             if self._guess == self._key:
                 self._result_flag = True
         else:
             self._result_flag = False
-
